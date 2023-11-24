@@ -14,8 +14,22 @@ const getAllUsersFromDB = async () => {
   );
   return result;
 };
-const getSingleUserFromDB = async (id: string) => {
-  const result = await UserModel.findOne({ id });
+const getSingleUserFromDB = async (userId: string) => {
+  const result = await UserModel.findOne({ userId });
+  return result;
+};
+
+const updateUserFromDB = async (
+  userId: string,
+  updatedUserData: User
+): Promise<User | null> => {
+  const result = await UserModel.findOneAndUpdate({ userId }, updatedUserData);
+
+  return result;
+};
+
+const deleteSingleUserFromDb = async (userId: string) => {
+  const result = await UserModel.deleteOne({ userId });
   return result;
 };
 
@@ -23,4 +37,6 @@ export const userServices = {
   createUserIntoDb,
   getAllUsersFromDB,
   getSingleUserFromDB,
+  deleteSingleUserFromDb,
+  updateUserFromDB,
 };

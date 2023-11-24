@@ -23,5 +23,5 @@ export type User = {
     city: string;
     country: string;
   };
-  orders: Order[];
+  orders?: Order[];
 };
