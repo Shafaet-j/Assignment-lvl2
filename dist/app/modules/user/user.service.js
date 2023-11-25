@@ -12,8 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.userServices = void 0;
 const user_model_1 = require("./user.model");
 // import { UserModel } from "./user.model";
-const createUserIntoDb = (user) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.UserModel.create(user);
+const createUserIntoDb = (userDdata) => __awaiter(void 0, void 0, void 0, function* () {
+    // const result = await UserModel.create(user);
+    const user = new user_model_1.UserModel(userDdata);
+    if (yield user.isUserExist(userDdata.userId)) {
+        throw new Error("User already exsits");
+    }
+    const result = yield user.save();
     return result;
 });
 const getAllUsersFromDB = () => __awaiter(void 0, void 0, void 0, function* () {

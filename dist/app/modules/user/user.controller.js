@@ -30,7 +30,7 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (err) {
         res.status(500).json({
             success: false,
-            message: "User not found",
+            message: err.message || "user not found",
             error: {
                 code: 404,
                 description: "User not found!",
@@ -55,7 +55,17 @@ const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const { userId } = req.params;
         const result = yield user_service_1.userServices.getSingleUserFromDB(userId);
-        res.status(200).json({
+        if (!result) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+                error: {
+                    code: 404,
+                    description: "User not found!",
+                },
+            });
+        }
+        return res.status(200).json({
             success: true,
             message: "User fetched successfully!",
             data: result,
@@ -63,7 +73,7 @@ const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
     catch (error) {
         console.error("Error:", error);
-        res.status(404).json({
+        return res.status(404).json({
             success: false,
             message: "User not found",
             error: {

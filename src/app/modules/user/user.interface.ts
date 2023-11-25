@@ -1,4 +1,4 @@
-import { Schema, model, connect } from "mongoose";
+import { Schema, model, connect, Model } from "mongoose";
 
 export type Order = {
   productName: string;
@@ -25,3 +25,9 @@ export type User = {
   };
   orders?: Order[];
 };
+
+export type UserMethods = {
+  isUserExist(userId: string): Promise<User | null>;
+};
+
+export type UsersModel = Model<User, {}, UserMethods>;
