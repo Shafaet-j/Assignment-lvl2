@@ -160,6 +160,36 @@ const getSingleUserOrder = (req, res) => __awaiter(void 0, void 0, void 0, funct
         });
     }
 });
+const getSingleUserOrderTotal = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.params;
+        const result = yield user_service_1.userServices.getUserOrdersFromDB(userId);
+        const orders = result === null || result === void 0 ? void 0 : result.orders;
+        let total = 0;
+        if (orders) {
+            for (let i = 0; i < orders.length; i++) {
+                const ele = orders[i];
+                total += ele.price * ele.quantity;
+            }
+        }
+        res.status(200).json({
+            success: true,
+            message: "Total price calculated successfully!",
+            data: total.toFixed(2),
+        });
+    }
+    catch (error) {
+        console.error("Error:", error);
+        res.status(404).json({
+            success: false,
+            message: "User not found",
+            error: {
+                code: 404,
+                description: "User not found!",
+            },
+        });
+    }
+});
 exports.UserController = {
     createUser,
     getAllUser,
@@ -168,4 +198,5 @@ exports.UserController = {
     updateUser,
     updateOrders,
     getSingleUserOrder,
+    getSingleUserOrderTotal,
 };

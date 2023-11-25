@@ -152,18 +152,17 @@ const getSingleUserOrderTotal = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const result = await userServices.getUserOrdersFromDB(userId);
     const orders = result?.orders;
+    let total = 0;
     if (orders) {
-      let total = 0;
       for (let i = 0; i < orders.length; i++) {
         const ele = orders[i];
         total += ele.price * ele.quantity;
-        total.toFixed(2);
       }
     }
     res.status(200).json({
       success: true,
-      message: "order fetched successfully!",
-      data: result,
+      message: "Total price calculated successfully!",
+      data: total.toFixed(2),
     });
   } catch (error) {
     console.error("Error:", error);
