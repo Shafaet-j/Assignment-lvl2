@@ -14,6 +14,7 @@ app.use(cors());
 app.use("/", UserRoutes);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Hello World! First project");
+  const message = "hey there im shafet hossen chanchal";
+  res.send({ message });
 });
 export default app;

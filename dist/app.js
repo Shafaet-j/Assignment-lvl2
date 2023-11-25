@@ -15,6 +15,7 @@ app.use((0, cors_1.default)());
 // app.use("/", UserRoutes);
 app.use("/", user_route_1.UserRoutes);
 app.get("/", (req, res) => {
-    res.send("Hello World! First project");
+    const message = "hey there im shafet hossen chanchal";
+    res.send({ message });
 });
 exports.default = app;
