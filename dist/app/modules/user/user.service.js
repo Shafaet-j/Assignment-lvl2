@@ -12,10 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.userServices = void 0;
 const user_model_1 = require("./user.model");
 // import { UserModel } from "./user.model";
-const createUserIntoDb = (userDdata) => __awaiter(void 0, void 0, void 0, function* () {
-    // const result = await UserModel.create(user);
-    const user = new user_model_1.UserModel(userDdata);
-    if (yield user.isUserExist(userDdata.userId)) {
+const createUserIntoDb = (userData) => __awaiter(void 0, void 0, void 0, function* () {
+    // const result = await UserModel.create(userData);
+    const user = new user_model_1.UserModel(userData);
+    if (yield user.isUserExist(userData.userId)) {
         throw new Error("User already exsits");
     }
     const result = yield user.save();
@@ -26,11 +26,23 @@ const getAllUsersFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
     return result;
 });
 const getSingleUserFromDB = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.UserModel.findOne({ userId });
+    const result = yield user_model_1.UserModel.findOne({ userId }, {
+        userId: 1,
+        username: 1,
+        fullName: 1,
+        age: 1,
+        email: 1,
+        isActive: 1,
+        hobbies: 1,
+        address: 1,
+    });
     return result;
 });
 const updateUserFromDB = (userId, updatedUserData) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.UserModel.findOneAndUpdate({ userId }, updatedUserData);
+    const result = yield user_model_1.UserModel.findOneAndUpdate({ userId }, updatedUserData, {
+        new: true,
+        runValidators: true,
+    });
     return result;
 });
 const updateOrdersFromDB = (userId, updatedUserData) => __awaiter(void 0, void 0, void 0, function* () {
@@ -38,7 +50,7 @@ const updateOrdersFromDB = (userId, updatedUserData) => __awaiter(void 0, void 0
     return result;
 });
 const deleteSingleUserFromDb = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.UserModel.deleteOne({ userId });
+    const result = yield user_model_1.UserModel.findOneAndDelete({ userId });
     return result;
 });
 const getUserOrdersFromDB = (userId) => __awaiter(void 0, void 0, void 0, function* () {

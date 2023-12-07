@@ -8,18 +8,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserModel = void 0;
 const mongoose_1 = require("mongoose");
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const config_1 = __importDefault(require("../../config"));
 const orderSchema = new mongoose_1.Schema({
     productName: { type: String, required: true },
     price: { type: Number, required: true },
     quantity: { type: Number, required: true },
 });
 const userSchema = new mongoose_1.Schema({
-    userId: { type: String },
-    userName: { type: String },
-    password: { type: String },
+    userId: { type: Number, required: true, unique: true },
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
     fullName: {
         firstName: { type: String, required: true },
         lastName: { type: String, required: true },
@@ -41,4 +46,9 @@ userSchema.methods.isUserExist = function (userId) {
         return existingUser;
     });
 };
+userSchema.pre("save", function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        this.password = yield bcrypt_1.default.hash(this.password, Number(config_1.default.bcrypt_salt_rounds));
+    });
+});
 exports.UserModel = (0, mongoose_1.model)("User", userSchema);

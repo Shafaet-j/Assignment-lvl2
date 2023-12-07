@@ -7,8 +7,8 @@ export type Order = {
 };
 
 export type User = {
-  userId: string;
-  userName: string;
+  userId: number;
+  username: string;
   password: string;
   fullName: {
     firstName: string;
@@ -27,7 +27,7 @@ export type User = {
 };
 
 export type UserMethods = {
-  isUserExist(userId: string): Promise<User | null>;
+  isUserExist(userId: number): Promise<User | null>;
 };
 
 export type UsersModel = Model<User, {}, UserMethods>;

@@ -2,10 +2,10 @@ import { User } from "./user.interface";
 import { UserModel } from "./user.model";
 // import { UserModel } from "./user.model";
 
-const createUserIntoDb = async (userDdata: User) => {
-  // const result = await UserModel.create(user);
-  const user = new UserModel(userDdata);
-  if (await user.isUserExist(userDdata.userId)) {
+const createUserIntoDb = async (userData: User) => {
+  // const result = await UserModel.create(userData);
+  const user = new UserModel(userData);
+  if (await user.isUserExist(userData.userId)) {
     throw new Error("User already exsits");
   }
   const result = await user.save();
@@ -20,7 +20,19 @@ const getAllUsersFromDB = async () => {
   return result;
 };
 const getSingleUserFromDB = async (userId: string) => {
-  const result = await UserModel.findOne({ userId });
+  const result = await UserModel.findOne(
+    { userId },
+    {
+      userId: 1,
+      username: 1,
+      fullName: 1,
+      age: 1,
+      email: 1,
+      isActive: 1,
+      hobbies: 1,
+      address: 1,
+    }
+  );
   return result;
 };
 
@@ -28,7 +40,10 @@ const updateUserFromDB = async (
   userId: string,
   updatedUserData: User
 ): Promise<User | null> => {
-  const result = await UserModel.findOneAndUpdate({ userId }, updatedUserData);
+  const result = await UserModel.findOneAndUpdate({ userId }, updatedUserData, {
+    new: true,
+    runValidators: true,
+  });
 
   return result;
 };
@@ -45,12 +60,12 @@ const updateOrdersFromDB = async (
   return result;
 };
 
-const deleteSingleUserFromDb = async (userId: string) => {
-  const result = await UserModel.deleteOne({ userId });
+const deleteSingleUserFromDb = async (userId: number) => {
+  const result = await UserModel.findOneAndDelete({ userId });
   return result;
 };
 
-const getUserOrdersFromDB = async (userId: string) => {
+const getUserOrdersFromDB = async (userId: number) => {
   const result = await UserModel.findOne({ userId }, { orders: 1 });
   return result;
 };

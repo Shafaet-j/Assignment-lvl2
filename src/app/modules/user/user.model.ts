@@ -1,5 +1,7 @@
 import { Schema, model, connect } from "mongoose";
 import { Order, User, UserMethods, UsersModel } from "./user.interface";
+import bcrypt from "bcrypt";
+import config from "../../config";
 
 const orderSchema = new Schema<Order>({
   productName: { type: String, required: true },
@@ -8,9 +10,9 @@ const orderSchema = new Schema<Order>({
 });
 
 const userSchema = new Schema<User, UsersModel, UserMethods>({
-  userId: { type: String },
-  userName: { type: String },
-  password: { type: String },
+  userId: { type: Number, required: true, unique: true },
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
   fullName: {
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
@@ -27,9 +29,16 @@ const userSchema = new Schema<User, UsersModel, UserMethods>({
   orders: { type: [orderSchema] },
 });
 
-userSchema.methods.isUserExist = async function (userId: string) {
+userSchema.methods.isUserExist = async function (userId: number) {
   const existingUser = await UserModel.findOne({ userId });
   return existingUser;
 };
+
+userSchema.pre("save", async function () {
+  this.password = await bcrypt.hash(
+    this.password,
+    Number(config.bcrypt_salt_rounds)
+  );
+});
 
 export const UserModel = model<User, UsersModel>("User", userSchema);

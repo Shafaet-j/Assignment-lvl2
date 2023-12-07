@@ -4,16 +4,17 @@ import userValidationSchema from "./user.validation";
 
 const createUser = async (req: Request, res: Response) => {
   try {
-    const user = req.body.user;
+    const user = req.body;
 
     // validation using zod
     const zodParserData = userValidationSchema.parse(user);
 
     const result = await userServices.createUserIntoDb(zodParserData);
+    const withOutPass = { ...result.toObject(), password: undefined };
     res.status(200).json({
       success: true,
       message: "User created successfully",
-      data: result,
+      data: withOutPass,
     });
   } catch (err: any) {
     res.status(500).json({
@@ -73,14 +74,25 @@ const getSingleUser = async (req: Request, res: Response) => {
 const deleteSingleUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const result = await userServices.deleteSingleUserFromDb(userId);
-    res.status(200).json({
+    const result = await userServices.deleteSingleUserFromDb(Number(userId));
+    console.log("hey", result);
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+        error: {
+          code: 404,
+          description: "User not found!",
+        },
+      });
+    }
+    return res.status(200).json({
       success: true,
       message: "User deleted successfully!",
       data: null,
     });
   } catch (error) {
-    res.status(404).json({
+    res.status(500).json({
       success: false,
       message: "User not found",
       error: {
@@ -95,6 +107,16 @@ const updateUser = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const updatedUserData = req.body;
     const result = await userServices.updateUserFromDB(userId, updatedUserData);
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+        error: {
+          code: 404,
+          description: "User not found!",
+        },
+      });
+    }
     res.status(200).json({
       success: true,
       message: "User Updated successfully!",
@@ -119,6 +141,16 @@ const updateOrders = async (req: Request, res: Response) => {
       userId,
       updatedUserData
     );
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+        error: {
+          code: 404,
+          description: "User not found!",
+        },
+      });
+    }
     res.status(200).json({
       success: true,
       message: "orders Updated successfully!",
@@ -139,15 +171,25 @@ const updateOrders = async (req: Request, res: Response) => {
 const getSingleUserOrder = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const result = await userServices.getUserOrdersFromDB(userId);
-    res.status(200).json({
+    const result = await userServices.getUserOrdersFromDB(Number(userId));
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+        error: {
+          code: 404,
+          description: "User not found!",
+        },
+      });
+    }
+    return res.status(200).json({
       success: true,
-      message: "order fetched successfully!",
-      data: result,
+      message: "Order fetched successfully!",
+      data: { orders: result?.orders },
     });
   } catch (error) {
     console.error("Error:", error);
-    res.status(404).json({
+    return res.status(404).json({
       success: false,
       message: "User not found",
       error: {
@@ -160,7 +202,7 @@ const getSingleUserOrder = async (req: Request, res: Response) => {
 const getSingleUserOrderTotal = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const result = await userServices.getUserOrdersFromDB(userId);
+    const result = await userServices.getUserOrdersFromDB(Number(userId));
     const orders = result?.orders;
     let total = 0;
     if (orders) {
@@ -169,11 +211,27 @@ const getSingleUserOrderTotal = async (req: Request, res: Response) => {
         total += ele.price * ele.quantity;
       }
     }
-    res.status(200).json({
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+        error: {
+          code: 404,
+          description: "User not found!",
+        },
+      });
+    }
+    return res.status(200).json({
       success: true,
-      message: "Total price calculated successfully!",
+      message: "Order fetched successfully!",
       data: total.toFixed(2),
     });
+
+    // res.status(200).json({
+    //   success: true,
+    //   message: "Total price calculated successfully!",
+    //   data: total.toFixed(2),
+    // });
   } catch (error) {
     console.error("Error:", error);
     res.status(404).json({
